@@ -23,7 +23,7 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Set any additional class parameters as needed
-        self.t = 1;
+        self.t = 0;
 
 
     def reset(self, destination=None, testing=False):
@@ -45,9 +45,9 @@ class LearningAgent(Agent):
             self.epsilon=0
             self.alpha=0
         else:
-            #self.epsilon = 1/float(math.sqrt(self.t))
-            self.epsilon=self.epsilon-0.05
             self.t=self.t+1;
+            self.epsilon = 1/float(math.sqrt(self.t))
+            #self.epsilon=self.epsilon-0.05
 
         return None
 
@@ -65,9 +65,6 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Set 'state' as a tuple of relevant data for the agent
-        #print waypoint    
-        #print inputs
-        #print deadline
         state = (waypoint, inputs['light'],inputs['oncoming'],inputs['left'],inputs['right'])
         return state
 
@@ -96,7 +93,7 @@ class LearningAgent(Agent):
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
         if state not in self.Q: 
-            self.Q[state]={None:0.0, 'left':0.0, 'right':0.0, 'forward':0.0}
+            self.Q[state]={action: 0 for action in self.valid_actions}
         return
 
 
@@ -119,8 +116,9 @@ class LearningAgent(Agent):
             if self.epsilon > random.random():
                 action = random.choice(self.valid_actions)
             else:
-                action = [k for k,v in self.Q[state].items() if v==self.get_maxQ(state)][0]
-        else: 
+                actions = [k for k,v in self.Q[state].items() if v==self.get_maxQ(state)]
+                action=random.choice(actions)
+        else:
             action = random.choice(self.valid_actions)           
         return action
 
@@ -187,7 +185,7 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, log_metrics=True,update_delay=0.01, display=False, optimized=False)
+    sim = Simulator(env, log_metrics=True,update_delay=0.01, display=False, optimized=True)
     
     ##############
     # Run the simulator
